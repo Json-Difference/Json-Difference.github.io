@@ -1,34 +1,48 @@
 <!doctype html>
-<html lang="en" class="h-100">
+<html lang="en">
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script src="diff.js"></script>
+    <script src="app.js"></script>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <title>Just the difference (JSON)</title>
   </head>
-  <body class="h-100">
+  <body>
     
-    <form class="h-100">
-      <div class="container-fluid h-100 pt-5">
+    <form>
+      <div class="container-fluid mt-5">
 
-        <div class="row h-75 justify-content-start">
-          <div class="col-lg-6 h-100 text-center align-self-center">
-              <textarea class="form-control h-100" id="comment"></textarea>
-            
+        <div class="row">
+          <div class="col-lg-6 text-center">
+              <label>Left</label>
+              <textarea 
+                class="form-control bg-light" 
+                rows="22" 
+                id="jsonLeft"
+                onInput="app.updateLeft(this.value)"></textarea>
+            <span id="errLeft">
           </div>          
-          <div class="col-lg-6 h-100 text-center align-self-center">
-              <textarea class="form-control h-100" id="comment"></textarea>          
+          <div class="col-lg-6 text-center">
+              <label>Right</label>
+              <textarea 
+                class="form-control bg-light" 
+                rows="22" 
+                id="jsonRight"                
+                onInput="app.updateRight(this.value)"></textarea>          
+              <span id="errRight">
           </div>
         </div>
-        <div class="w-100 text-center pt-5">            
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        <div class="row">          
+          <div class="col-lg text-center">
+            <button type="button" class="btn btn-primary mt-5" data-toggle="modal" data-target="#exampleModal" id="compare">
               See the difference
             </button>
+          </div>            
         </div>
       </div>
         
