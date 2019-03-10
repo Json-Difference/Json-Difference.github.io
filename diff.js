@@ -66,12 +66,12 @@ var diff = function diff(left, right) {
         
         flatObject[stringKey] = {
           stringKey: stringKey,
-          key: linearKey.slice(),
-          [identifier]: {              
-            type: currNode.type
-          }
-        }
-            
+          key: linearKey.slice()
+        }        
+      
+        flatObject[stringKey][identifier] = {              
+          type: currNode.type
+        }            
 
         if (["object", "array"].indexOf(currNode.type) > -1) {
           keyStack.push(currentKeys);
