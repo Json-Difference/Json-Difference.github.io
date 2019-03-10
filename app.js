@@ -6,7 +6,7 @@ var app = {
     document.getElementById(elementId).textContent = text
   },
   disableCompare: () => {
-    document.getElementById("compare").setAttribute("disabled", "");
+    
   },
   enableCompare: () => {
     app.left && app.right && document.getElementById("compare").removeAttribute("disabled");
@@ -43,14 +43,47 @@ var app = {
   }  
 }
 
-document.addEventListener('DOMContentLoaded', function () {
 
-  var editors_json = ["json-left", "json-right"].map(function(id){
-      return CodeMirror.fromTextArea(document.getElementById(id), {
+document.addEventListener('DOMContentLoaded', function () {
+  
+    
+  var textAreas = 
+  [
+    {
+      id: "json-left",
+      valid: false    
+    },
+    {
+      id: "json-right",
+      valid: false
+    }
+  ];
+
+  var computeDifference = document.getElementById("compute-difference");
+  var differenceList = document.getElementById("difference-list");
+  
+  computeDifference.addEventListener("click", function(){
+    differenceList.innerHTML = "<h1>loading ...</h1>";
+    
+  })
+  
+  editors_json = textAreas.map(function(textArea, index, array){
+      return CodeMirror.fromTextArea(document.getElementById(textArea.id), {
         lineNumbers: true,
         mode: "application/json",
         gutters: ["CodeMirror-lint-markers"],
-        lint: true
+        lint: {
+          onUpdateLinting: function(annotationsNotSorted, annotations, cm) {
+            
+            textArea.valid = annotationsNotSorted.length === 0;
+            
+            if (array.some(function(x) {return !x.valid})){
+              computeDifference.setAttribute("disabled","");
+            } else {
+              computeDifference.removeAttribute("disabled");        
+            }
+          }
+        }
       });
   });
 });

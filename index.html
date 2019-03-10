@@ -21,13 +21,13 @@
 <section class="section">
   <div class="container">
     <div class="columns">
-      <div class="column">
+      <div class="column is-half">
         <p class="has-text-centered">
           <span>Left</span>
         </p>
         <textarea id="json-left"/></textarea>
       </div>
-      <div class="column" >
+      <div class="column is-half" >
         <p class="has-text-centered">
           <span>Right</span>
         </p>
@@ -36,28 +36,27 @@
       </div>
     </div>
     <div class="has-text-centered">
-      <button class="button is-info modal-button" data-target="modal-difference">See the difference</button>
+      <button id="compute-difference" class="button is-info modal-button" data-target="modal-difference">See the difference</button>
     </div>
     
   </div>   
   
 </section>  
 <div id="modal-difference"class="modal">
-
   <div class="modal-background"></div>
-  <div class="modal-content">
-    <div class="box">
-      <article class="media">
-        <p>
-              <strong>John Smith</strong> <small>@johnsmith</small> <small>31m</small>
-              <br>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-            </p>
-      </article>
-    </div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modal title</p>
+      <button class="delete has-background-danger" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="content" id="difference-list">
+        
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+    </footer>
   </div>
-  <button class="modal-close is-large" aria-label="close"></button>
-
 </div>
 </body>
 </html>
