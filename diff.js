@@ -1,6 +1,13 @@
 "use strict";
 
-
+if (!String.prototype.startsWith) {
+    Object.defineProperty(String.prototype, 'startsWith', {
+        value: function(search, pos) {
+            pos = !pos || pos < 0 ? 0 : +pos;
+            return this.substring(pos, pos + search.length) === search;
+        }
+    });
+}
 
 var diff = function diff(left, right) {
   function _typeof(obj) { 
@@ -108,10 +115,10 @@ var diff = function diff(left, right) {
         return !key.left || !key.right || key.left.type !== key.right.type || key.left.val !== key.right.val;
       })
       .filter(function (key, index, arr) {
-        return arr.findIndex(function (other) {
+        return !arr.some(function (other) {
           return key.stringKey.startsWith(other.stringKey.slice(0, -1)) ? other.stringKey !== key.stringKey : false;
-      }) < 0})
-      // })
+        });
+      })
       .map(function (key) {
         return {
           key: key.stringKey,
