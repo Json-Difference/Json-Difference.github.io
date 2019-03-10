@@ -1,49 +1,4 @@
 
-var app = {
-  left: false,
-  right: false,
-  updateElement: (elementId, text) => {
-    document.getElementById(elementId).textContent = text
-  },
-  disableCompare: () => {
-    
-  },
-  enableCompare: () => {
-    app.left && app.right && document.getElementById("compare").removeAttribute("disabled");
-  },
-  updateLeft: (value) => {
-    
-    app.updateElement("errLeft","");
-    
-    try {
-      app.left = JSON.parse(value);
-    }
-    catch(err){
-      app.left = false;
-      app.disableCompare();
-      app.updateElement("errLeft", err);
-    }
-    
-    app.enableCompare();
-  },
-  updateRight: (value) => {
-    
-    app.updateElement("errRight", "");
-    
-    try {
-      app.right = JSON.parse(value);
-    }
-    catch(err){
-      app.right = false;
-      app.disableCompare();
-      app.updateElement("errRight", err);
-    }
-    
-    app.enableCompare();
-  }  
-}
-
-
 document.addEventListener('DOMContentLoaded', function () {
   
     
@@ -61,11 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   var computeDifference = document.getElementById("compute-difference");
   var differenceList = document.getElementById("difference-list");
-  
-  computeDifference.addEventListener("click", function(){
-    differenceList.innerHTML = "<h1>loading ...</h1>";
-    
-  })
   
   editors_json = textAreas.map(function(textArea, index, array){
       return CodeMirror.fromTextArea(document.getElementById(textArea.id), {
@@ -85,5 +35,26 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
       });
+  });
+  
+  
+  computeDifference.addEventListener("click", function() {
+    
+    differenceList.innerHTML = "<h1>loading ...</h1>";
+    
+    var jsons = editors_json.map(function(editor) {
+      
+      var json = JSON.parse(editor.getValue());
+      editor.setValue(JSON.stringify(json, null, 2))
+      return json;
+    });
+    
+    console.log(diff(jsons[0], jsons[1]).sort(function(a, b) {
+      return a.key < b.key 
+        ? -1 
+        : a.key > b.key
+          ? 1
+          : 0;
+    }));
   });
 });
