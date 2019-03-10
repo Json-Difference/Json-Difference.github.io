@@ -1,5 +1,7 @@
 'use strict';
 
+var bulma = {};
+
 document.addEventListener('DOMContentLoaded', function () {
 
   // Modals
@@ -9,13 +11,16 @@ document.addEventListener('DOMContentLoaded', function () {
   var $modalButtons = getAll('.modal-button');
   var $modalCloses = getAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button');
 
+  bulma.showModal = function (targetId) {
+    var $target = document.getElementById(targetId);
+    rootEl.classList.add('is-clipped');
+    $target.classList.add('is-active');
+  }
+  
   if ($modalButtons.length > 0) {
     $modalButtons.forEach(function ($el) {
       $el.addEventListener('click', function () {
-        var target = $el.dataset.target;
-        var $target = document.getElementById(target);
-        rootEl.classList.add('is-clipped');
-        $target.classList.add('is-active');
+        bulma.showModal($el.dataset.target);
       });
     });
   }

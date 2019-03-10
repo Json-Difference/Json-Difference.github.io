@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', function () {
       return json;
     });
     
+    bulma.showModal("modal-difference")
+    
     differenceList.innerHTML = "<pre>" + JSON.stringify(diff(jsons[0], jsons[1]), null, 2) + "</pre>";
 
   });
