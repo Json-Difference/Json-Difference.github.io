@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var jsons = editors_json.map(function(editor) {
       
       var json = JSON.parse(editor.getValue());
-      editor.setValue(JSON.stringify(json, null, 4))
+      editor.setValue(JSON.stringify(json, null, 2))
       return json;
     });
     
