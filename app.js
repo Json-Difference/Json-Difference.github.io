@@ -45,16 +45,11 @@ document.addEventListener('DOMContentLoaded', function () {
     var jsons = editors_json.map(function(editor) {
       
       var json = JSON.parse(editor.getValue());
-      editor.setValue(JSON.stringify(json, null, 2))
+      editor.setValue(JSON.stringify(json, null, 4))
       return json;
     });
     
-    console.log(diff(jsons[0], jsons[1]).sort(function(a, b) {
-      return a.key < b.key 
-        ? -1 
-        : a.key > b.key
-          ? 1
-          : 0;
-    }));
+    differenceList.innerHTML = "<pre>" + JSON.stringify(diff(jsons[0], jsons[1]), null, 2) + "</pre>";
+
   });
 });

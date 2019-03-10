@@ -128,6 +128,13 @@ var diff = function diff(left, right) {
           rightMissing: !key.right,
           typeDifferent: (key.left || {}).type !== (key.right || {}).type && ("left is " + (key.left || {}).type +" and right is "+(key.right || {}).type)
         };
+      })
+      .sort(function(a, b) {
+        return a.key < b.key 
+          ? -1 
+          : a.key > b.key
+            ? 1
+            : 0;
       });
   };
 
