@@ -42,3 +42,15 @@ var app = {
     app.enableCompare();
   }  
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+
+  var editors_json = ["json-left", "json-right"].map(function(id){
+      return CodeMirror.fromTextArea(document.getElementById(id), {
+        lineNumbers: true,
+        mode: "application/json",
+        gutters: ["CodeMirror-lint-markers"],
+        lint: true
+      });
+  });
+});
