@@ -19,11 +19,13 @@ document.addEventListener('DOMContentLoaded', function () {
   [
     {
       id: "json-left",
-      valid: false    
+      valid: false,
+      error: document.getElementById("json-left-error")      
     },
     {
       id: "json-right",
-      valid: false
+      valid: false,
+      error: document.getElementById("json-right-error")     
     }
   ];
 
@@ -45,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
           onUpdateLinting: function(annotationsNotSorted, annotations, cm) {
             
             textArea.valid = annotationsNotSorted.length === 0;
+            
+            textArea.error.innerText = textArea.valid ? "" : annotationsNotSorted[0].message.replace(/\s+/g, " ");
             
             if (array.some(function(x) {return !x.valid})){
               computeDifference.setAttribute("disabled","");
@@ -92,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function () {
       cellClick:function(e, row){ //trigger an alert message when the row is clicked
         var rowData = row.getData();
         Object.keys(rowDetails).forEach(function (key) {
-          rowDetails[key].innerHTML = rowData[key];
+          rowDetails[key].innerText = rowData[key];
         });
         
         bulma.showModal("row-details-modal");
