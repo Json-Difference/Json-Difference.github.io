@@ -15,7 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
   ];
 
   var computeDifference = document.getElementById("compute-difference");
-  var differenceList = document.getElementById("difference-list");
+  var rowDetails = {
+    keyPath: document.getElementById("key-path"),
+    leftVal: document.getElementById("left-val"),
+    leftType: document.getElementById("left-type"),
+    rightVal: document.getElementById("right-val"),
+    rightType: document.getElementById("right-type")    
+  }; 
   
   editors_json = textAreas.map(function(textArea, index, array){
       return CodeMirror.fromTextArea(document.getElementById(textArea.id), {
@@ -40,18 +46,37 @@ document.addEventListener('DOMContentLoaded', function () {
   
   computeDifference.addEventListener("click", function() {
     
-    differenceList.innerHTML = "<h1>loading ...</h1>";
     
     var jsons = editors_json.map(function(editor) {
       
-      var json = JSON.parse(editor.getValue());
-      editor.setValue(JSON.stringify(json, null, 2))
+      var json = editor.getValue();
+      editor.setValue(JSON.stringify(JSON.parse(json), null, 2))
       return json;
     });
     
     bulma.showModal("modal-difference")
     
-    differenceList.innerHTML = "<pre>" + JSON.stringify(diff(jsons[0], jsons[1]), null, 2) + "</pre>";
-
+    var table = new Tabulator("#difference-list", {
+      height: "75vh", 
+      data: diff(jsons[0], jsons[1]),
+      layout: "fitColumns", //fit columns to width of table (optional)
+      columns:[ //Define Table Columns
+        {title:"Key Path", field:"keyPath", width:150},
+        {title:"Left Type", field:"leftType"},
+        {title:"Left Value", field:"leftVal", align:"left"},
+        {title:"Right Type", field:"rightType"},
+        {title:"Right Value", field:"rightVal", align:"left"},
+        {title:"Type Different", field:"typeDifferent", align:"center"},
+      ],
+      cellClick:function(e, row){ //trigger an alert message when the row is clicked
+        var rowData = row.getData();
+        Object.keys(rowDetails).forEach(function (key) {
+          rowDetails[key].innerHTML = rowData[key];
+        });
+        
+        bulma.showModal("row-details-modal");
+      },
+    });
+    
   });
 });

@@ -1,0 +1,362 @@
+diff --git a/app.js b/app.js
+index 20c8c50..97e206e 100644
+--- a/app.js
++++ b/app.js
+@@ -15,7 +15,13 @@ document.addEventListener('DOMContentLoaded', function () {
+   ];
+ 
+   var computeDifference = document.getElementById("compute-difference");
+-  var differenceList = document.getElementById("difference-list");
++  var rowDetails = {
++    keyPath: document.getElementById("key-path"),
++    leftVal: document.getElementById("left-val"),
++    leftType: document.getElementById("left-type"),
++    rightVal: document.getElementById("right-val"),
++    rightType: document.getElementById("right-type")    
++  }; 
+   
+   editors_json = textAreas.map(function(textArea, index, array){
+       return CodeMirror.fromTextArea(document.getElementById(textArea.id), {
+@@ -40,18 +46,37 @@ document.addEventListener('DOMContentLoaded', function () {
+   
+   computeDifference.addEventListener("click", function() {
+     
+-    differenceList.innerHTML = "<h1>loading ...</h1>";
+     
+     var jsons = editors_json.map(function(editor) {
+       
+-      var json = JSON.parse(editor.getValue());
+-      editor.setValue(JSON.stringify(json, null, 2))
++      var json = editor.getValue();
++      editor.setValue(JSON.stringify(JSON.parse(json), null, 2))
+       return json;
+     });
+     
+     bulma.showModal("modal-difference")
+     
+-    differenceList.innerHTML = "<pre>" + JSON.stringify(diff(jsons[0], jsons[1]), null, 2) + "</pre>";
+-
++    var table = new Tabulator("#difference-list", {
++      height: "75vh", 
++      data: diff(jsons[0], jsons[1]),
++      layout: "fitColumns", //fit columns to width of table (optional)
++      columns:[ //Define Table Columns
++        {title:"Key Path", field:"keyPath", width:150},
++        {title:"Left Type", field:"leftType"},
++        {title:"Left Value", field:"leftVal", align:"left"},
++        {title:"Right Type", field:"rightType"},
++        {title:"Right Value", field:"rightVal", align:"left"},
++        {title:"Type Different", field:"typeDifferent", align:"center"},
++      ],
++      cellClick:function(e, row){ //trigger an alert message when the row is clicked
++        var rowData = row.getData();
++        Object.keys(rowDetails).forEach(function (key) {
++          rowDetails[key].innerHTML = rowData[key];
++        });
++        
++        bulma.showModal("row-details-modal");
++      },
++    });
++    
+   });
+ });
+\ No newline at end of file
+diff --git a/bulma-modals.js b/bulma-modals.js
+index 9b9d7c8..99d9f6f 100644
+--- a/bulma-modals.js
++++ b/bulma-modals.js
+@@ -7,28 +7,21 @@ document.addEventListener('DOMContentLoaded', function () {
+   // Modals
+ 
+   var rootEl = document.documentElement;
+-  var $modals = getAll('.modal');
+-  var $modalButtons = getAll('.modal-button');
+-  var $modalCloses = getAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button');
++  var $modals = [];
++  var $modalCloses = getAll('.modal-background, .modal-close, .modal-card-head .delete, .modal-card-foot .button, .delete');
+ 
+   bulma.showModal = function (targetId) {
+     var $target = document.getElementById(targetId);
+     rootEl.classList.add('is-clipped');
+     $target.classList.add('is-active');
++    $modals.push($target);
+   }
+   
+-  if ($modalButtons.length > 0) {
+-    $modalButtons.forEach(function ($el) {
+-      $el.addEventListener('click', function () {
+-        bulma.showModal($el.dataset.target);
+-      });
+-    });
+-  }
+ 
+   if ($modalCloses.length > 0) {
+     $modalCloses.forEach(function ($el) {
+       $el.addEventListener('click', function () {
+-        closeModals();
++        closeLastModal();
+       });
+     });
+   }
+@@ -36,15 +29,15 @@ document.addEventListener('DOMContentLoaded', function () {
+   document.addEventListener('keydown', function (event) {
+     var e = event || window.event;
+     if (e.keyCode === 27) {
+-      closeModals();
++      closeLastModal();
+     }
+   });
+ 
+-  function closeModals() {
+-    rootEl.classList.remove('is-clipped');
+-    $modals.forEach(function ($el) {
+-      $el.classList.remove('is-active');
+-    });
++  function closeLastModal() {
++    $modals.pop().classList.remove('is-active');
++    if ($modals.length === 0) {
++      rootEl.classList.remove('is-clipped');
++    }
+   }
+ 
+   // Functions
+diff --git a/diff.js b/diff.js
+index eaaffa5..403ecfa 100644
+--- a/diff.js
++++ b/diff.js
+@@ -25,12 +25,6 @@ var diff = function diff(left, right) {
+     return _typeof(obj); 
+   }
+   
+-  var getSafely = function getSafely(keys, object) {
+-    return keys.reduce(function (currObject, currKey) {
+-      return currObject && _typeof(currObject) === "object" ? currObject[currKey] : {}[currKey];
+-    }, object);
+-  };
+-  
+   var getKeysWithTypesAndVals = function getKeysWithTypesAndVals(object) {
+     return Object.keys(object).map(function(key) {
+       var val = object[key];
+@@ -46,21 +40,19 @@ var diff = function diff(left, right) {
+     })
+   }
+ 
+-  var getKeysOnly = function getKeysOnly(keyTypeArray) {
+-    return keyTypeArray.map(function(keyType){
+-      return keyType.key;
+-    });
++  var isObjectOrArray = function isObjectOrArray (type){
++    return type === "object" || type === "array";
+   }
+   
+-  var linearizeJson = function linearizeJson(baseObject, identifier) {
++  var flattenJson = function flattenJson(baseObject, identifier) {
+     if (!(baseObject && _typeof(baseObject) === "object")) return [];
+     var keyStack = [getKeysWithTypesAndVals(baseObject)];
+-    var linearKey = [];
++    var keyPathArray = [];
+     var flatObject = {};
+ 
+     while (keyStack.length > 0) {
+       
+-      linearKey.pop();
++      keyPathArray.pop();
+       var currentKeys = keyStack.pop();
+ 
+       while (currentKeys && currentKeys.length > 0) {
+@@ -68,24 +60,23 @@ var diff = function diff(left, right) {
+         if (!currNode) continue;
+         
+                 
+-        linearKey.push(currNode.key);     
+-        var stringKey = JSON.stringify(linearKey.slice(1));
++        keyPathArray.push(currNode.key);     
++        var keyPath = JSON.stringify(keyPathArray.slice(1));
+         
+-        flatObject[stringKey] = {
+-          stringKey: stringKey,
+-          key: linearKey.slice()
+-        }        
++        flatObject[keyPath] = {
++          keyPath: keyPath
++        };        
+       
+-        flatObject[stringKey][identifier] = {              
+-          type: currNode.type
+-        }            
+-
+-        if (["object", "array"].indexOf(currNode.type) > -1) {
++        flatObject[keyPath][identifier] = {              
++          type: currNode.type,
++          val: currNode.val
++        };
++        
++        if (isObjectOrArray(currNode.type)) {
+           keyStack.push(currentKeys);
+           currentKeys = getKeysWithTypesAndVals(currNode.val);
+         } else {    
+-          flatObject[stringKey][identifier].val = currNode.val
+-          linearKey.pop();
++          keyPathArray.pop();
+         }
+       }
+     }
+@@ -93,50 +84,62 @@ var diff = function diff(left, right) {
+     return flatObject;
+   };
+ 
++  var getTypeString = function getTypeString (type) {
++    return type || JSON.stringify(type) || "undefined" 
++  }
++  
++  var getValuePrimitive = function getValuePrimitive (val, type) {
++    return isObjectOrArray(type) ? JSON.stringify(val, null, 2) : val;
++  } 
+   var getDifferences = function getDifferences(left, right) {
+-    var linearLeft = linearizeJson(left, "left");
+-    var linearRight = linearizeJson(right, "right");
++    var flatLeft = flattenJson(left, "left");
++    var flatRight = flattenJson(right, "right");
+     
+-    for (var attrname in linearLeft) { 
+-      if (linearRight[attrname]){
+-        linearRight[attrname].left = linearLeft[attrname].left; 
++    for (var attrname in flatLeft) { 
++      if (flatRight[attrname]){
++        flatRight[attrname].left = flatLeft[attrname].left; 
+       }else{
+-        linearRight[attrname] = linearLeft[attrname]
++        flatRight[attrname] = flatLeft[attrname]
+       }
+     }
+     
+     
+     
+-    return Object.keys(linearRight)
++    return Object.keys(flatRight)
+       .map(function (key) {        
+-        return linearRight[key];
++        return flatRight[key];
+       })
+       .filter(function(key){
+-        return !key.left || !key.right || key.left.type !== key.right.type || key.left.val !== key.right.val;
++        return !key.left 
++        || !key.right 
++        || key.left.type !== key.right.type 
++        || (key.left.val !== key.right.val && !isObjectOrArray(key.left.type)) ;
+       })
+       .filter(function (key, index, arr) {
+         return !arr.some(function (other) {
+-          return key.stringKey.startsWith(other.stringKey.slice(0, -1)) ? other.stringKey !== key.stringKey : false;
++          return key.keyPath.startsWith(other.keyPath.slice(0, -1)) ? other.keyPath !== key.keyPath : false;
+         });
+       })
+-      .map(function (key) {
+-        return {
+-          key: key.stringKey,
+-          left: (key.left || {}).val || getSafely(key.key, left),
+-          right: (key.right || {}).val || getSafely(key.key, right),
+-          leftMissing: !key.left,
+-          rightMissing: !key.right,
+-          typeDifferent: (key.left || {}).type !== (key.right || {}).type && ("left is " + (key.left || {}).type +" and right is "+(key.right || {}).type)
+-        };
+-      })
+       .sort(function(a, b) {
+-        return a.key < b.key 
++        return a.keyPath < b.keyPath 
+           ? -1 
+-          : a.key > b.key
++          : a.keyPath > b.keyPath
+             ? 1
+             : 0;
+-      });
++      })
++      .map(function (key) {
++        var leftSafe = (key.left || {});
++        var rightSafe = (key.right || {});
++        return {
++          keyPath: key.keyPath,
++          leftVal: getValuePrimitive(leftSafe.val, leftSafe.type),
++          rightVal: getValuePrimitive(rightSafe.val, rightSafe.type),
++          leftType: getTypeString(leftSafe.type),
++          rightType: getTypeString(rightSafe.type),
++          typeDifferent: leftSafe.type !== rightSafe.type
++        };
++      })
+   };
+ 
+-  return getDifferences({root: left}, {root: right});
++  return getDifferences({root: JSON.parse(left)}, {root: JSON.parse(right)});
+ };
+diff --git a/index.html b/index.html
+index 512bd66..e2cd6fb 100644
+--- a/index.html
++++ b/index.html
+@@ -7,16 +7,18 @@
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/codemirror.min.css">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/addon/lint/lint.min.css">
++<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.2.3/css/tabulator.min.css">
+ <link rel="stylesheet" href="./styles.css">
+ 
+-<script src="bulma-modals.js"></script>
+-<script src="diff.js"></script>
+-<script src="app.js"></script>
+-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/codemirror.js"></script>
++<script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.2.3/js/tabulator.min.js"></script>
++<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/codemirror.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonlint/1.6.0/jsonlint.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/addon/lint/lint.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/addon/lint/json-lint.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/mode/javascript/javascript.min.js"></script>
++<script src="bulma-modals.js"></script>
++<script src="diff.js"></script> 
++<script src="app.js"></script>
+ </head>
+ <body>
+ <section class="section">
+@@ -67,5 +69,26 @@
+     </footer>
+   </div>
+ </div>
++<div id="row-details-modal" class="modal">
++  <div class="modal-background"></div>
++  <div class="modal-content">
++    <div class="box has-background-light">
++      <div class="has-text-right">
++        <button class="delete has-background-danger" aria-label="close"></button>
++      </div>
++      <article class="media">        
++        <div class="media-content">
++          <div class="content">
++            <div id="row-details" class="">
++<strong class="">Key Path = </strong><span id="key-path"></span>
++<strong>Left: <span id="left-type"></span></strong> = <span id="left-val"></span>
++<strong>Right: <span id="right-type"></span></strong> = <span id="right-val"></span>
++            </div>
++          </div>
++        </div>
++      </article>
++    </div>
++  </div>
++</div>
+ </body>
+ </html>
+\ No newline at end of file
+diff --git a/styles.css b/styles.css
+index 577c54d..94c256a 100644
+--- a/styles.css
++++ b/styles.css
+@@ -1,4 +1,11 @@
+ .CodeMirror {
+   height: 75vh;
+   border: 1px solid black;
++}
++.modal-card {
++  width: 90vw;
++}
++#row-details {
++  white-space: pre;
++  font-family: monospace;
+ }
+\ No newline at end of file

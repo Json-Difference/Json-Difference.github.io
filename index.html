@@ -7,16 +7,18 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/codemirror.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/addon/lint/lint.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.2.3/css/tabulator.min.css">
 <link rel="stylesheet" href="./styles.css">
 
-<script src="bulma-modals.js"></script>
-<script src="diff.js"></script>
-<script src="app.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/codemirror.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/4.2.3/js/tabulator.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsonlint/1.6.0/jsonlint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/addon/lint/lint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/addon/lint/json-lint.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.44.0/mode/javascript/javascript.min.js"></script>
+<script src="bulma-modals.js"></script>
+<script src="diff.js"></script> 
+<script src="app.js"></script>
 </head>
 <body>
 <section class="section">
@@ -65,6 +67,27 @@
     </section>
     <footer class="modal-card-foot">
     </footer>
+  </div>
+</div>
+<div id="row-details-modal" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <div class="box has-background-light">
+      <div class="has-text-right">
+        <button class="delete has-background-danger" aria-label="close"></button>
+      </div>
+      <article class="media">        
+        <div class="media-content">
+          <div class="content">
+            <div id="row-details" class="">
+<strong class="">Key Path = </strong><span id="key-path"></span>
+<strong>Left: <span id="left-type"></span></strong> = <span id="left-val"></span>
+<strong>Right: <span id="right-type"></span></strong> = <span id="right-val"></span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
   </div>
 </div>
 </body>
