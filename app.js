@@ -62,14 +62,15 @@ document.addEventListener('DOMContentLoaded', function () {
     bulma.showModal("modal-difference")
     
     var table = new Tabulator("#difference-list", {
-      height: "75vh", 
+      height: "auto", 
       data: diff(jsons[0], jsons[1]),
+      tooltips:true,
       layout: "fitColumns", //fit columns to width of table (optional)
       columns:[ //Define Table Columns
         {title:"Key Path", field:"keyPath", sorter: compareKeyPath},
-        {title:"Left Type", field:"leftType"},
+        {title:"Left Type", field:"leftType", align:"right"},
         {title:"Left Value", field:"leftVal", formatter: "bold"},
-        {title:"Right Type", field:"rightType"},
+        {title:"Right Type", field:"rightType", align:"right"},
         {title:"Right Value", field:"rightVal", formatter: "bold"},
         {title:"Type Different", field:"typeDifferent"},
       ],
