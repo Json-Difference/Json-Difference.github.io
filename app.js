@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             textArea.valid = annotationsNotSorted.length === 0;
             
-            textArea.error.innerText = textArea.valid ? "" : annotationsNotSorted[0].message.replace(/\s+/g, " ");
+            textArea.error.innerText = textArea.valid ? "" : annotationsNotSorted[0].message;
             
             if (array.some(function(x) {return !x.valid})){
               computeDifference.setAttribute("disabled","");
