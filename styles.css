@@ -3,7 +3,8 @@
   border: 1px solid black;
 }
 .modal-card {
-  width: 90vw;
+  width: auto;
+  max-width: 90vw;
 }
 #row-details {
   white-space: pre;
