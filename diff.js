@@ -152,7 +152,7 @@ var diff = function diff(left, right) {
       .map(function (key) {
         var leftSafe = (key.left || {});
         var rightSafe = (key.right || {});
-        return {
+        var curr = {
           keyPath: key.keyPath,
           leftVal: getValuePrimitive(leftSafe.val, leftSafe.type),
           rightVal: getValuePrimitive(rightSafe.val, rightSafe.type),
@@ -160,6 +160,17 @@ var diff = function diff(left, right) {
           rightType: getTypeString(rightSafe.type),
           typeDifferent: leftSafe.type !== rightSafe.type
         };
+        
+        curr.leftTableDisplay = { 
+            type: curr.leftType,
+            val: curr.leftVal
+        }
+        curr.rightTableDisplay = {
+            type: curr.rightType, 
+            val: curr.rightVal
+        }
+        
+        return curr;
       })
   };
 
