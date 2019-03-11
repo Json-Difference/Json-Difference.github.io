@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function () {
       data: diff(jsons[0], jsons[1]),
       tooltips:function(cell){
         var cellVal = cell.getValue();
-        return  _typeof(cell.getValue()) === "object" ? "("+ cellVal.type + ") " + cellVal.val : cellVal;
+        return  _typeof(cellVal) === "object" ? "("+ cellVal.type + ") " + cellVal.val : cellVal;
       },
       layout: "fitColumns", //fit columns to width of table (optional)
       columns:[ //Define Table Columns
