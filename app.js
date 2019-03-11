@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
       data: diff(jsons[0], jsons[1]),
       layout: "fitColumns", //fit columns to width of table (optional)
       columns:[ //Define Table Columns
-        {title:"Key Path", field:"keyPath", width:150},
+        {title:"Key Path", field:"keyPath", width:150, sorter: compareKeyPath},
         {title:"Left Type", field:"leftType"},
         {title:"Left Value", field:"leftVal", align:"left"},
         {title:"Right Type", field:"rightType"},

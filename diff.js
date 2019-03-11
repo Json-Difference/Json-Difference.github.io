@@ -9,6 +9,32 @@ if (!String.prototype.startsWith) {
     });
 }
 
+var compareKeyPath = function compareKeyPath (a, b) {
+  var keyPathA = JSON.parse(a)
+  var keyPathB = JSON.parse(b);
+  
+  for (var index in keyPathA) {
+    var keyA = keyPathA[index];
+    var keyB = keyPathB[index];
+    
+    if(keyA === keyB) {
+      continue;
+    }
+    
+    if (+keyA == keyA && +keyB == keyB) {
+      return keyA - keyB
+    }
+    
+    return keyA < keyB 
+          ? -1 
+          : keyA > keyB
+            ? 1
+            : 0;
+  } 
+  
+  return 0;
+}
+
 var diff = function diff(left, right) {
   function _typeof(obj) { 
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { 
@@ -121,11 +147,7 @@ var diff = function diff(left, right) {
         });
       })
       .sort(function(a, b) {
-        return a.keyPath < b.keyPath 
-          ? -1 
-          : a.keyPath > b.keyPath
-            ? 1
-            : 0;
+        return compareKeyPath(a.keyPath, b.keyPath);
       })
       .map(function (key) {
         var leftSafe = (key.left || {});
