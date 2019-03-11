@@ -44,8 +44,9 @@ document.addEventListener('DOMContentLoaded', function () {
   });
   
   Tabulator.prototype.extendModule("format", "formatters", {
-    bold:function(cell, formatterParams){
-        return "<strong>" + cell.getValue() + "</strong>"; //make the contents of the cell bold
+    typeVal:function(cell, formatterParams){
+        var cellVal = cell.getValue();
+        return "("+ cellVal.type + ") <strong>" + cellVal.val + "</strong>"; 
     }
   });
   
@@ -68,10 +69,8 @@ document.addEventListener('DOMContentLoaded', function () {
       layout: "fitColumns", //fit columns to width of table (optional)
       columns:[ //Define Table Columns
         {title:"Key Path", field:"keyPath", sorter: compareKeyPath},
-        {title:"Left Type", field:"leftType", align:"right"},
-        {title:"Left Value", field:"leftVal", formatter: "bold"},
-        {title:"Right Type", field:"rightType", align:"right"},
-        {title:"Right Value", field:"rightVal", formatter: "bold"},
+        {title:"Left", field:"leftTableDisplay", formatter: "typeVal"},
+        {title:"Right", field:"rightTableDisplay", formatter: "typeVal"},
         {title:"Type Different", field:"typeDifferent"},
       ],
       cellClick:function(e, row){ //trigger an alert message when the row is clicked
