@@ -1,6 +1,19 @@
 
 document.addEventListener('DOMContentLoaded', function () {
-  
+  function _typeof(obj) { 
+    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { 
+        _typeof = function _typeof(obj) { 
+          return typeof obj; 
+        }; 
+    } 
+    else { 
+      _typeof = function _typeof(obj) { 
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; 
+      }; 
+    } 
+    
+    return _typeof(obj); 
+  }
     
   var textAreas = 
   [
@@ -65,7 +78,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var table = new Tabulator("#difference-list", {
       height: "auto", 
       data: diff(jsons[0], jsons[1]),
-      tooltips:true,
+      tooltips:function(cell){
+        var cellVal = cell.getValue();
+        return  _typeof(cell.getValue()) === "object" ? "("+ cellVal.type + ") " + cellVal.val : cellVal;
+      },
       layout: "fitColumns", //fit columns to width of table (optional)
       columns:[ //Define Table Columns
         {title:"Key Path", field:"keyPath", sorter: compareKeyPath},
