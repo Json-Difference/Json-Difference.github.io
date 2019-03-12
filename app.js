@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
         {title:"Key Path", field:"keyPath", sorter: compareKeyPath},
         {title:"Left", field:"leftTableDisplay", formatter: "typeVal"},
         {title:"Right", field:"rightTableDisplay", formatter: "typeVal"},
-        {title:"Type Different", field:"typeDifferent"},
+        {title:"Data Type Different", field:"typeDifferent"},
       ],
       cellClick:function(e, row){ //trigger an alert message when the row is clicked
         var rowData = row.getData();
